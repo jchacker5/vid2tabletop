@@ -1,111 +1,75 @@
 # Vid2Tabletop
 
-Transform basketball game videos into immersive 3D tabletop experiences on Apple Vision Pro.
+Vid2Tabletop is a Vision Pro app that allows users to input a YouTube URL of an NBA game. It processes the video to extract game data and converts it into a 3D tabletop representation using RealityKit.
 
-## Overview
+## Current Project Status
 
-Vid2Tabletop is an innovative visionOS application that converts basketball game footage into interactive 3D visualizations. Watch your favorite basketball games come to life as a tabletop experience, with real-time player tracking and immersive statistics.
+### Completed Features ✅
+
+- **Core UI and MVP Features** implemented with SwiftUI and RealityKit
+- **YOLO Integration** for robust player and ball tracking
+- **Real-time Processing Pipeline** with progress reporting
+- **3D Court Visualization** with interactive controls
+- **Player Detection and Tracking** using YOLOv8-pose
+- **Ball Detection and Tracking** using YOLOv8
+- **Team Differentiation** using color clustering
+- **Basic Game Clock Extraction** using Vision OCR
+
+### In Progress 🚧
+
+- Advanced metadata extraction (player stats, detailed game events)
+- Enhanced UI/UX features (advanced gesture controls, voice commands)
+- Export functionality for processed data (CSV/JSON)
+- Performance optimizations for longer videos
 
 ## Features
 
-- 🏀 3D Basketball Court Visualization
-- 👥 Real-time Player Tracking
-- 🎮 Gesture-based Controls
-- 🗣️ Voice Command Support
-- 📊 Interactive Statistics
-- 🎥 Video Integration
-- 👁️ Eye Tracking Support
-- 🤝 Multi-user Experience (coming soon)
+### Video Processing
 
-## Requirements
+- ✅ YouTube video integration
+- ✅ YOLO-based player detection and tracking
+- ✅ Ball tracking with high accuracy
+- ✅ Real-time processing with progress feedback
 
-- Xcode 15.2 or later
-- visionOS 1.0 or later
-- Apple Vision Pro device or simulator
-- Swift 5.9 or later
+### 3D Visualization
 
-## Installation
+- ✅ Interactive basketball court model
+- ✅ Player position visualization
+- ✅ Ball trajectory tracking
+- ✅ Team differentiation
+- 🚧 Advanced camera controls
 
-1. Clone the repository:
+### Data Analysis
 
-```bash
-git clone https://github.com/jchacker5/vid2tabletop.git
-```
+- ✅ Basic game clock synchronization
+- 🚧 Player statistics extraction
+- 🚧 Team score tracking
+- 🚧 Data export functionality
 
-2. Open the project in Xcode:
+## Dependencies
 
-```bash
-cd vid2tabletop/app
-open Vid2Tabletop.xcodeproj
-```
+- [YouTube iOS Player Helper](https://github.com/youtube/youtube-ios-player-helper.git)
+- [Swift Algorithms](https://github.com/apple/swift-algorithms)
+- [Swift Collections](https://github.com/apple/swift-collections)
+- [PythonKit](https://github.com/pvieito/PythonKit.git)
+- [Ultralytics YOLO](https://github.com/ultralytics/ultralytics)
 
-3. Select the Vision Pro simulator or device
-4. Build and run the project (⌘R)
+## How to Run
 
-## Project Structure
-
-```
-vid2tabletop/
-├── app/                    # Vision Pro Application
-│   ├── Vid2Tabletop/      # Main App Source
-│   ├── Packages/          # Swift Packages
-│   └── Resources/         # Assets and Resources
-└── pipeline/              # Python YOLO Processing
-```
-
-## Usage
-
-1. Launch the app on your Vision Pro
-2. Upload a basketball game video or connect to a live stream
-3. Use hand gestures to control the view:
-   - Pinch to select and interact
-   - Rotate for camera control
-   - Spread for zoom
-4. Use voice commands for quick actions:
-   - "Show stats" - Display player statistics
-   - "Switch camera" - Change viewing angle
-   - "Track player" - Focus on specific player
-
-## Development
-
-See [PROJECT_STATUS.md](PROJECT_STATUS.md) for current development status and roadmap.
-
-### Building from Source
-
-1. Install dependencies:
+1. Install Python dependencies:
 
 ```bash
-# Install XcodeGen if not already installed
-brew install xcodegen
-
-# Generate Xcode project
-xcodegen generate
+pip install ultralytics torch
 ```
 
-2. Open the project:
+2. Open the project in Xcode
+3. Build and run on a visionOS compatible device or simulator
+4. Input a valid YouTube NBA game URL and click "Convert to Tabletop"
 
-```bash
-open Vid2Tabletop.xcodeproj
-```
+## Implementation Details
 
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+For a detailed implementation plan and technical documentation, see [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- YOLO for computer vision processing
-- RealityKit for 3D rendering
-- The basketball analytics community
-
-## Contact
-
-Project Link: [https://github.com/jchacker5/vid2tabletop](https://github.com/jchacker5/vid2tabletop)
+MIT License (see LICENSE file).
