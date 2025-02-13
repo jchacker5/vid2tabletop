@@ -1,0 +1,72 @@
+{
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "resources": {
+    "entities": {
+      "BasketballCourt": {
+        "materials": {
+          "CourtFloor": {
+            "color": {
+              "color-space": "srgb",
+              "components": {
+                "alpha": "1.000",
+                "blue": "0.200",
+                "green": "0.400",
+                "red": "0.800"
+              }
+            },
+            "roughness": "1.000",
+            "type": "physically-based"
+          },
+          "Lines": {
+            "color": {
+              "color-space": "srgb",
+              "components": {
+                "alpha": "1.000",
+                "blue": "1.000",
+                "green": "1.000",
+                "red": "1.000"
+              }
+            },
+            "roughness": "1.000",
+            "type": "physically-based"
+          }
+        },
+        "meshes": {
+          "Court": {
+            "primitives": [
+              {
+                "attributes": {
+                  "normal": "NORMAL",
+                  "position": "POSITION",
+                  "texcoord": "TEXCOORD_0"
+                },
+                "material": "CourtFloor",
+                "type": "triangles"
+              }
+            ]
+          },
+          "Lines": {
+            "primitives": [
+              {
+                "attributes": {
+                  "normal": "NORMAL",
+                  "position": "POSITION"
+                },
+                "material": "Lines",
+                "type": "lines"
+              }
+            ]
+          }
+        },
+        "transform": {
+          "rotation": [0, 0, 0, 1],
+          "scale": [1, 1, 1],
+          "translation": [0, 0, 0]
+        }
+      }
+    }
+  }
+}

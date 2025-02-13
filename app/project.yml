@@ -1,0 +1,33 @@
+name: Vid2Tabletop
+options:
+  bundleIdPrefix: com.jchacker5
+  deploymentTarget:
+    visionOS: 1.0
+packages:
+  RealityKitContent:
+    path: ./Packages/RealityKitContent
+targets:
+  Vid2Tabletop:
+    type: application
+    platform: visionOS
+    sources:
+      - Vid2Tabletop
+    dependencies:
+      - package: RealityKitContent
+    info:
+      path: Vid2Tabletop/Info.plist
+      properties:
+        CFBundleDisplayName: Vid2Tabletop
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        NSMicrophoneUsageDescription: We need access to the microphone for voice commands.
+        NSSpeechRecognitionUsageDescription: We need speech recognition for voice commands.
+        NSHandsTrackingUsageDescription: We need to track your hands for gesture controls.
+        NSWorldSensingUsageDescription: We need to understand your space to place the tabletop view.
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+        GENERATE_INFOPLIST_FILE: YES
+        SUPPORTED_PLATFORMS: "xros xrsimulator"
+        TARGETED_DEVICE_FAMILY: "7"
