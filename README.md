@@ -1,75 +1,151 @@
 # Vid2Tabletop
 
-Vid2Tabletop is a Vision Pro app that allows users to input a YouTube URL of an NBA game. It processes the video to extract game data and converts it into a 3D tabletop representation using RealityKit.
-
-## Current Project Status
-
-### Completed Features ✅
-
-- **Core UI and MVP Features** implemented with SwiftUI and RealityKit
-- **YOLO Integration** for robust player and ball tracking
-- **Real-time Processing Pipeline** with progress reporting
-- **3D Court Visualization** with interactive controls
-- **Player Detection and Tracking** using YOLOv8-pose
-- **Ball Detection and Tracking** using YOLOv8
-- **Team Differentiation** using color clustering
-- **Basic Game Clock Extraction** using Vision OCR
-
-### In Progress 🚧
-
-- Advanced metadata extraction (player stats, detailed game events)
-- Enhanced UI/UX features (advanced gesture controls, voice commands)
-- Export functionality for processed data (CSV/JSON)
-- Performance optimizations for longer videos
+A Vision Pro app that transforms NBA game videos into interactive 3D tabletop experiences. Watch basketball games come to life in your space with real-time player tracking and immersive visualization.
 
 ## Features
 
-### Video Processing
+### Video Processing ✅
 
-- ✅ YouTube video integration
-- ✅ YOLO-based player detection and tracking
-- ✅ Ball tracking with high accuracy
-- ✅ Real-time processing with progress feedback
+- Real-time YouTube video integration with synchronized playback
+- YOLO-based player detection and tracking using YOLOv8-pose
+- Ball tracking with high accuracy using YOLOv8
+- Progress reporting and error handling
+- Frame-by-frame processing with AVFoundation
 
-### 3D Visualization
+### 3D Visualization ✅
 
-- ✅ Interactive basketball court model
-- ✅ Player position visualization
-- ✅ Ball trajectory tracking
-- ✅ Team differentiation
-- 🚧 Advanced camera controls
+- Interactive basketball court model with RealityKit
+- Real-time player position visualization
+- Ball trajectory tracking
+- Team differentiation using color clustering
+- Gesture controls for court manipulation
+- Multiple view layouts (side-by-side, stacked, tabletop only)
 
-### Data Analysis
+### Game Analysis ✅
 
-- ✅ Basic game clock synchronization
-- 🚧 Player statistics extraction
-- 🚧 Team score tracking
-- 🚧 Data export functionality
+- Basic game clock synchronization
+- Score tracking
+- Quarter tracking
+- Player position heatmaps
 
-## Dependencies
+### Vision Pro Integration ✅
 
-- [YouTube iOS Player Helper](https://github.com/youtube/youtube-ios-player-helper.git)
-- [Swift Algorithms](https://github.com/apple/swift-algorithms)
-- [Swift Collections](https://github.com/apple/swift-collections)
-- [PythonKit](https://github.com/pvieito/PythonKit.git)
-- [Ultralytics YOLO](https://github.com/ultralytics/ultralytics)
+- Native visionOS window management
+- Hand gesture support
+- Environment understanding
+- Multiple window layouts
+- Floating game metadata
+- Proper permissions handling
 
-## How to Run
+## Requirements
 
-1. Install Python dependencies:
+- Xcode 15.2 or later
+- visionOS 1.0 or later
+- Python 3.8 or later (for YOLO model training)
+- Vision Pro device or simulator
+
+## Installation
+
+1. Clone the repository:
 
 ```bash
-pip install ultralytics torch
+git clone https://github.com/yourusername/vid2tabletop.git
+cd vid2tabletop
 ```
 
-2. Open the project in Xcode
-3. Build and run on a visionOS compatible device or simulator
-4. Input a valid YouTube NBA game URL and click "Convert to Tabletop"
+2. Install Python dependencies:
 
-## Implementation Details
+```bash
+pip install ultralytics torch pyyaml
+```
 
-For a detailed implementation plan and technical documentation, see [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+3. Download and train YOLO models:
+
+```bash
+cd app/Vid2Tabletop/Models
+chmod +x download_models.sh
+./download_models.sh
+python train_models.py
+```
+
+4. Open the project in Xcode:
+
+```bash
+cd ../..
+open Vid2Tabletop.xcodeproj
+```
+
+## Usage
+
+1. Launch the app on Vision Pro
+2. Input a YouTube URL of an NBA game
+3. Use hand gestures to control the view:
+   - Pinch and drag to move the court
+   - Pinch to zoom
+   - Two-finger rotation
+4. Toggle between view layouts using the toolbar
+5. Use the settings panel to customize visualization
+
+## Architecture
+
+### Core Services
+
+- `VideoProcessingService`: Handles video processing and synchronization
+- `YOLOProcessingService`: Manages ML-based detection and tracking
+- `CourtVisualizer`: Manages 3D visualization and updates
+
+### Views
+
+- `MainView`: Primary app interface with window management
+- `TabletopView`: 3D court visualization
+- `VideoPlayerView`: 2D video playback
+- `GameMetadataView`: Game statistics and information
+
+### ML Models
+
+- Player detection: YOLOv8-pose for pose estimation
+- Ball tracking: YOLOv8 for object detection
+- Custom trained models for basketball-specific detection
+
+## Development Status
+
+### Completed Features ✅
+
+- Core video processing pipeline
+- YOLO integration and model training
+- 3D visualization with RealityKit
+- Window management and layouts
+- Basic game analysis
+- Hand gesture controls
+
+### In Progress 🚧
+
+- Advanced player statistics
+- Team identification
+- Multi-game analysis
+- Export functionality
+- Performance optimizations
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Documentation
+
+- [Implementation Plan](IMPLEMENTATION_PLAN.md): Detailed technical documentation
+- [API Reference](docs/API.md): Service and component documentation
+- [Model Training](docs/TRAINING.md): ML model training guide
 
 ## License
 
-MIT License (see LICENSE file).
+MIT License - see [LICENSE](LICENSE) file
+
+## Acknowledgments
+
+- [Ultralytics YOLO](https://github.com/ultralytics/ultralytics) for object detection
+- [RealityKit](https://developer.apple.com/documentation/realitykit/) for 3D visualization
+- [Vision](https://developer.apple.com/documentation/vision) for image processing

@@ -7,11 +7,20 @@ import CoreML
 import PythonKit
 
 /// Service responsible for processing YouTube videos and converting them to 3D tabletop representations
-class VideoProcessingService {
+@MainActor
+class VideoProcessingService: NSObject, ObservableObject, YTPlayerViewDelegate {
     static let shared = VideoProcessingService()
     private let courtVisualizer = CourtVisualizer.shared
     private let yoloProcessor = YOLOProcessingService.shared
+    
+    @Published private(set) var player: AVPlayer?
+    @Published private(set) var isProcessing = false
+    @Published private(set) var processingProgress: Double = 0
+    @Published private(set) var gameMetadata: GameMetadata?
+    
     private var playerView: YTPlayerView?
+    private var videoAsset: AVAsset?
+    private var timeObserver: Any?
     
     enum VideoProcessingError: Error {
         case invalidURL
@@ -23,19 +32,41 @@ class VideoProcessingService {
         case yoloError(String)
     }
     
+    private override init() {
+        super.init()
+        setupTimeObserver()
+    }
+    
+    private func setupTimeObserver() {
+        // Observe video playback time for synchronization
+        timeObserver = player?.addPeriodicTimeObserver(
+            forInterval: CMTime(seconds: 0.1, preferredTimescale: 600),
+            queue: .main
+        ) { [weak self] time in
+            self?.updateVisualization(at: time)
+        }
+    }
+    
     /// Process a YouTube video and convert it to a 3D tabletop representation
     /// - Parameters:
     ///   - url: The YouTube video URL
     ///   - progressHandler: Closure to report processing progress (0.0 to 1.0)
     /// - Throws: VideoProcessingError if processing fails
     func processYouTubeVideo(url: String, progressHandler: @escaping (Double) -> Void) async throws {
+        isProcessing = true
+        processingProgress = 0
+        
         guard let videoID = extractYouTubeID(from: url) else {
             throw VideoProcessingError.invalidURL
         }
         
+        // Initialize video playback
+        try await setupVideoPlayback(videoID: videoID)
+        
         // Process video using YOLO
         let trackingResults = try await yoloProcessor.processVideo(url: url) { progress in
-            progressHandler(progress * 0.7) // YOLO processing is 70% of total progress
+            processingProgress = progress * 0.7 // YOLO processing is 70% of total progress
+            progressHandler(processingProgress)
         }
         
         // Convert tracking results to 3D coordinates
@@ -44,19 +75,81 @@ class VideoProcessingService {
             ball: trackingResults.ball.first
         )
         
-        // Extract game metadata (clock, score, etc.)
-        let metadata = try await extractGameMetadata(from: url)
+        // Extract game metadata
+        gameMetadata = try await extractGameMetadata(from: url)
         
         // Update visualization
-        await MainActor.run {
-            courtVisualizer.updatePlayerPositions(coordinates.players)
-            if let ballPos = coordinates.ballPosition {
-                courtVisualizer.updateBallPosition(ballPos)
-            }
-            courtVisualizer.updateGameMetadata(metadata)
+        courtVisualizer.updatePlayerPositions(coordinates.players)
+        if let ballPos = coordinates.ballPosition {
+            courtVisualizer.updateBallPosition(ballPos)
+        }
+        
+        isProcessing = false
+        processingProgress = 1.0
+        progressHandler(1.0)
+    }
+    
+    private func setupVideoPlayback(videoID: String) async throws {
+        // Create YouTube player view
+        let playerView = YTPlayerView()
+        playerView.delegate = self
+        self.playerView = playerView
+        
+        // Load video
+        return try await withCheckedThrowingContinuation { continuation in
+            playerView.load(withVideoId: videoID, playerVars: [
+                "playsinline": 1,
+                "controls": 1,
+                "modestbranding": 1,
+                "rel": 0
+            ])
             
-            // Final progress update
-            progressHandler(1.0)
+            // Wait for video to be ready
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                continuation.resume()
+            }
+        }
+    }
+    
+    private func updateVisualization(at time: CMTime) {
+        // Update court visualization based on current video time
+        Task {
+            if let currentFrame = try? await extractFrame(at: time) {
+                let results = try? await yoloProcessor.processFrame(currentFrame)
+                if let results = results {
+                    let coordinates = try? await convertToTableTop(
+                        players: results.players,
+                        ball: results.ball.first
+                    )
+                    if let coordinates = coordinates {
+                        courtVisualizer.updatePlayerPositions(coordinates.players)
+                        if let ballPos = coordinates.ballPosition {
+                            courtVisualizer.updateBallPosition(ballPos)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func extractFrame(at time: CMTime) async throws -> CGImage {
+        guard let asset = videoAsset else {
+            throw VideoProcessingError.processingFailed
+        }
+        
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            generator.generateCGImageAsynchronously(for: time) { image, _, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let image = image {
+                    continuation.resume(returning: image)
+                } else {
+                    continuation.resume(throwing: VideoProcessingError.processingFailed)
+                }
+            }
         }
     }
     
@@ -195,6 +288,31 @@ class VideoProcessingService {
             homeScore: 0,
             awayScore: 0
         )
+    }
+    
+    // MARK: - YTPlayerViewDelegate
+    
+    func playerViewDidBecomeReady(_ playerView: YTPlayerView) {
+        // Create AVPlayer for synchronized playback
+        if let videoURL = playerView.videoUrl {
+            let asset = AVAsset(url: videoURL)
+            self.videoAsset = asset
+            let playerItem = AVPlayerItem(asset: asset)
+            self.player = AVPlayer(playerItem: playerItem)
+        }
+    }
+    
+    func playerView(_ playerView: YTPlayerView, didChangeTo state: YTPlayerState) {
+        switch state {
+        case .playing:
+            player?.play()
+        case .paused:
+            player?.pause()
+        case .ended:
+            player?.seek(to: .zero)
+        default:
+            break
+        }
     }
 }
 
